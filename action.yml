@@ -1,0 +1,57 @@
+name: Wait for AWS Amplify Deployment
+description: Waits for an AWS Amplify Deployment to be successful
+
+branding:
+  icon: box
+  color: blue
+
+inputs:
+  aws-access-key-id:
+    description: AWS Access Key ID
+    required: true
+  aws-secret-access-key:
+    description: AWS Secret Access Key
+    required: true
+  aws-region:
+    description: AWS Region
+    required: true
+  amplify-app-id:
+    description: AWS Amplify Application ID
+    required: true
+  branch-name:
+    description: AWS Amplify Application Branch Name
+    required: true
+  commit-id:
+    description: Commit Hash that triggered the deployment
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install AWS CLI
+      uses: unfor19/install-aws-cli-action@27d6061dae5d39e89be4d2246824f15e111a7e06
+      with:
+        version: 2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ github.event.inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ github.event.inputs.aws-secret-access-key }}
+        aws-region: ${{ github.event.inputs.aws-region }}
+
+    - name: Wait for Amplify Deployment
+      id: amplify-deploy
+      uses: nick-fields/retry@3f757583fb1b1f940bc8ef4bf4734c8dc02a5847
+      with:
+        max_attempts: 15
+        retry_wait_seconds: 60
+        timeout_seconds: 10
+        retry_on_exit_code: 99
+        shell: bash
+        command: |
+          AWS_AMPLIFY_DEPLOYMENT_STATUS=$(aws amplify list-jobs --region ${{ secrets.AWS_REGION }} --app-id ${{ secrets.AMPLIFY_APP_ID }} --branch-name ${{ github.event.inputs.branch-name }} | jq -r ".jobSummaries[] | select(.commitId == \"${{ github.event.inputs.commit-id }}\") | .status")
+          [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" = "FAILED" ] || [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" = "CANCELLED" ] && exit 1
+          [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" != "SUCCEED" ] && exit 99
+          echo "AWS_AMPLIFY_DEPLOYMENT_STATUS='${AWS_AMPLIFY_DEPLOYMENT_STATUS}'" >> $GITHUB_ENV
+
