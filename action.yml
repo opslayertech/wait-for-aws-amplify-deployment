@@ -36,9 +36,9 @@ runs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ github.event.inputs.aws-access-key-id }}
-        aws-secret-access-key: ${{ github.event.inputs.aws-secret-access-key }}
-        aws-region: ${{ github.event.inputs.aws-region }}
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
 
     - name: Wait for Amplify Deployment
       id: amplify-deploy
@@ -50,7 +50,7 @@ runs:
         retry_on_exit_code: 99
         shell: bash
         command: |
-          AWS_AMPLIFY_DEPLOYMENT_STATUS=$(aws amplify list-jobs --region ${{ secrets.AWS_REGION }} --app-id ${{ secrets.AMPLIFY_APP_ID }} --branch-name ${{ github.event.inputs.branch-name }} | jq -r ".jobSummaries[] | select(.commitId == \"${{ github.event.inputs.commit-id }}\") | .status")
+          AWS_AMPLIFY_DEPLOYMENT_STATUS=$(aws amplify list-jobs --region ${{ inputs.aws-region }} --app-id ${{ inputs.amplify-app-id }} --branch-name ${{ inputs.branch-name }} | jq -r ".jobSummaries[] | select(.commitId == \"${{ inputs.commit-id }}\") | .status")
           [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" = "FAILED" ] || [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" = "CANCELLED" ] && exit 1
           [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" != "SUCCEED" ] && exit 99
           echo "AWS_AMPLIFY_DEPLOYMENT_STATUS='${AWS_AMPLIFY_DEPLOYMENT_STATUS}'" >> $GITHUB_ENV

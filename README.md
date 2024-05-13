@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Wait for AWS Amplify App Deployment
-        uses: opslayer/wait-for-aws-amplify-deployment
+        uses: opslayer/wait-for-aws-amplify-deployment@main
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
