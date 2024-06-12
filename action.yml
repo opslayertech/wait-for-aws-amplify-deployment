@@ -24,6 +24,18 @@ inputs:
   commit-id:
     description: Commit Hash that triggered the deployment
     required: true
+  max-attempts:
+    description: Maximum number of attempts
+    required: false
+    default: '15'
+  retry-wait-seconds:
+    description: Waiting time between each retry (in seconds)
+    required: false
+    default: '60'
+  timeout-seconds:
+    description: Attempt timeout (in seconds)
+    required: false
+    default: '10'
 
 runs:
   using: "composite"
@@ -44,9 +56,9 @@ runs:
       id: amplify-deploy
       uses: nick-fields/retry@3f757583fb1b1f940bc8ef4bf4734c8dc02a5847
       with:
-        max_attempts: 15
-        retry_wait_seconds: 60
-        timeout_seconds: 10
+        max_attempts: ${{ inputs.max-attempts }}
+        retry_wait_seconds: ${{ inputs.retry-wait-seconds }}
+        timeout_seconds: ${{ inputs.timeout-seconds }}
         retry_on_exit_code: 99
         shell: bash
         command: |
