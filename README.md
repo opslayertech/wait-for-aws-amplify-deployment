@@ -17,12 +17,11 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Wait for AWS Amplify App Deployment
-        uses: opslayer/wait-for-aws-amplify-deployment@main
+        uses: opslayer/wait-for-aws-amplify-deployment@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          amplify-app-id: '${{ secrets.AMPLIFY_APP_ID }}'
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-role-to-assume: ${{ vars.AWS_ROLE }}
+          amplify-id: ${{ vars.AMPLIFY_ID }}
           branch-name: '${{ github.ref_name }}'
           commit-id: '${{ github.event.pull_request.head.sha }}'
 ```
