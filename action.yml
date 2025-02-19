@@ -6,14 +6,11 @@ branding:
   color: blue
 
 inputs:
-  aws-access-key-id:
-    description: AWS Access Key ID
-    required: true
-  aws-secret-access-key:
-    description: AWS Secret Access Key
-    required: true
   aws-region:
     description: AWS Region
+    required: true
+  aws-role-to-assume:
+    description: Role for which to fetch credentials. Only required for OIDC.
     required: true
   amplify-app-id:
     description: AWS Amplify Application ID
@@ -48,9 +45,8 @@ runs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ inputs.aws-access-key-id }}
-        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: ${{ inputs.aws-region }}
+        role-to-assume: ${{ inputs.aws-role-to-assume }}
 
     - name: Wait for Amplify Deployment
       id: amplify-deploy
