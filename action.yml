@@ -37,7 +37,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: |
+    - name: check aws
+      shell: bash
+      run: |
         aws --help
 
     - name: Install AWS CLI
