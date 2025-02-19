@@ -12,7 +12,7 @@ inputs:
   aws-role-to-assume:
     description: Role for which to fetch credentials. Only required for OIDC.
     required: true
-  amplify-app-id:
+  amplify-id:
     description: AWS Amplify Application ID
     required: true
   branch-name:
@@ -58,7 +58,7 @@ runs:
         retry_on_exit_code: 99
         shell: bash
         command: |
-          AWS_AMPLIFY_DEPLOYMENT_STATUS=$(aws amplify list-jobs --region ${{ inputs.aws-region }} --app-id ${{ inputs.amplify-app-id }} --branch-name ${{ inputs.branch-name }} | jq -r ".jobSummaries[] | select(.commitId == \"${{ inputs.commit-id }}\") | .status")
+          AWS_AMPLIFY_DEPLOYMENT_STATUS=$(aws amplify list-jobs --region ${{ inputs.aws-region }} --app-id ${{ inputs.amplify-id }} --branch-name ${{ inputs.branch-name }} | jq -r ".jobSummaries[] | select(.commitId == \"${{ inputs.commit-id }}\") | .status")
           [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" = "FAILED" ] || [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" = "CANCELLED" ] && exit 1
           [ "${AWS_AMPLIFY_DEPLOYMENT_STATUS}" != "SUCCEED" ] && exit 99
           echo "AWS_AMPLIFY_DEPLOYMENT_STATUS='${AWS_AMPLIFY_DEPLOYMENT_STATUS}'" >> $GITHUB_ENV
