@@ -37,6 +37,8 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - run: which aws
+
     - name: Install AWS CLI
       uses: unfor19/install-aws-cli-action@27d6061dae5d39e89be4d2246824f15e111a7e06
       with:
